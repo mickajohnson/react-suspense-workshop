@@ -5,20 +5,22 @@ import "bootstrap/dist/css/bootstrap.css";
 import "./index.css";
 import App from "./App";
 import ErrorDisplay from "./components/ErrorDisplay";
+import Loading from "./components/Loading";
 import * as serviceWorker from "./serviceWorker";
 
-ReactDOM.render(
+ReactDOM.unstable_createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ErrorBoundary
-      fallbackRender={({ error, componentStack }) => (
-        <ErrorDisplay error={error} componentStack={componentStack} />
-      )}
-    >
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+    <React.Suspense fallback={<Loading />}>
+      <ErrorBoundary
+        fallbackRender={({ error, componentStack }) => (
+          <ErrorDisplay error={error} componentStack={componentStack} />
+          )}
+          >
+        <App />
+      </ErrorBoundary>
+    </React.Suspense>
+  </React.StrictMode>
+  );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

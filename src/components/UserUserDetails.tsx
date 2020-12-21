@@ -1,8 +1,7 @@
 import React from "react";
-import useAbortableFetch from "use-abortable-fetch";
 import { useParams, useHistory } from "react-router-dom";
 
-import ErrorDisplay from "./ErrorDisplay";
+import resource from "./resource";
 import Loading from "./Loading";
 import LabeledInput from "./LabeledInput";
 
@@ -11,20 +10,14 @@ type RouteParams = {
 };
 
 const UserUserDetails: React.FC = () => {
-  const isPending = false;
   const history = useHistory();
   const { userId } = useParams<RouteParams>();
-  const { data, error, loading } = useAbortableFetch<User>(
-    `https://the-problem-solver-sample-data.azurewebsites.net/accounts/${userId}?sleep=2000`
-  );
 
-  if (error) {
-    return <ErrorDisplay error={error} />;
-  }
+  const data = resource.read<User>(`https://the-problem-solver-sample-data.azurewebsites.net/accounts/${userId}?sleep=2000`)
 
-  if (loading || !data || typeof data === "string") {
-    return <Loading />;
-  }
+  const [startTransition, isPending] = React.unstable_useTransition({
+    timeoutMs: 10000
+  })
 
   return (
     <div>
@@ -32,7 +25,9 @@ const UserUserDetails: React.FC = () => {
         <button
           className="btn btn-primary float-right"
           onClick={() => {
-            history.push("/users");
+            startTransition(() =>
+              history.push("/users")
+            )
           }}
         >
           Back to users
